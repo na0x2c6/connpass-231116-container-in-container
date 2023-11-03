@@ -1,0 +1,40 @@
+FROM docker.io/jenkins/jenkins:lts-alpine
+
+USER root
+
+RUN apk add --no-cache rsync tzdata shadow make
+
+RUN curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip \
+    && unzip rclone-current-linux-amd64.zip \
+    && cp rclone-*-linux-amd64/rclone /usr/local/bin \
+    && chmod 755 /usr/local/bin/rclone \
+    && rm -rf rclone-*
+
+# ref: https://www.redhat.com/sysadmin/podman-inside-container
+RUN apk add --no-cache podman fuse-overlayfs openrc
+RUN echo jenkins:10000:5000 > /etc/subuid; \
+    echo jenkins:10000:5000 > /etc/subgid;
+
+VOLUME /var/lib/containers
+VOLUME /home/jenkins/.local/share/containers
+
+ADD https://raw.githubusercontent.com/containers/libpod/master/contrib/podmanimage/stable/containers.conf /etc/containers/containers.conf
+ADD https://raw.githubusercontent.com/containers/libpod/master/contrib/podmanimage/stable/podman-containers.conf /home/jenkins/.config/containers/containers.conf
+
+RUN chown jenkins:jenkins -R /home/jenkins
+
+# chmod containers.conf and adjust storage.conf to enable Fuse storage.
+RUN chmod 644 /etc/containers/containers.conf; \
+    sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' /etc/containers/storage.conf
+
+RUN mkdir -p /var/lib/shared/overlay-images /var/lib/shared/overlay-layers /var/lib/shared/vfs-images /var/lib/shared/vfs-layers; \
+    touch /var/lib/shared/overlay-images/images.lock; \
+    touch /var/lib/shared/overlay-layers/layers.lock; \
+    touch /var/lib/shared/vfs-images/images.lock; \
+    touch /var/lib/shared/vfs-layers/layers.lock;
+
+ENV _CONTAINERS_USERNS_CONFIGURED=""
+
+RUN apk add --no-cache podman-docker
+
+USER jenkins
