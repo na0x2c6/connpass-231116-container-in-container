@@ -4,12 +4,6 @@ USER root
 
 RUN apk add --no-cache rsync tzdata shadow make
 
-RUN curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip \
-    && unzip rclone-current-linux-amd64.zip \
-    && cp rclone-*-linux-amd64/rclone /usr/local/bin \
-    && chmod 755 /usr/local/bin/rclone \
-    && rm -rf rclone-*
-
 # ref: https://www.redhat.com/sysadmin/podman-inside-container
 RUN apk add --no-cache podman fuse-overlayfs openrc
 RUN echo jenkins:10000:5000 > /etc/subuid; \
