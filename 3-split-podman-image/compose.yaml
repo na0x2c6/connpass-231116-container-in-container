@@ -2,9 +2,6 @@ services:
   podman:
     image: quay.io/podman/stable:latest
     privileged: true
-      # security_opt:
-      #   - label:disable
-      # user: podman
     devices:
       - /dev/fuse
     volumes:
