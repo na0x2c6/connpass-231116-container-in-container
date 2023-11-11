@@ -39,11 +39,7 @@ spec:
       name: a2d5a86ee9b23c4de28d6a0b7ac3121b3f9e94c63edbb28943a152e7145c0421-pvc
     - mountPath: /var/lib/containers
       name: e26e3c8e07a6553599ba7c5ad16fdc9bec5b700f7fa4d9a838ed153fdba6433e-pvc
-  - env:
-    - name: JAVA_OPTS
-      # see: https://stackoverflow.com/a/75296913
-      value: -Djdk.lang.Process.launchMechanism=vfork
-    image: image-jenkins
+  - image: image-jenkins
     name: ci-jenkins
     securityContext: {}
     volumeMounts:

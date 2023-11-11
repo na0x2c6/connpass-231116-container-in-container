@@ -6,5 +6,9 @@ RUN apk add --no-cache rsync tzdata shadow make podman docker-cli docker-cli-com
 
 USER jenkins
 
+# See: https://stackoverflow.com/a/75296913
+ENV JAVA_OPTS=-Djdk.lang.Process.launchMechanism=vfork
+
+# To connect the podman engine in the same pod
 ENV CONTAINER_HOST=tcp://127.0.0.1:2375
 ENV DOCKER_HOST=tcp://127.0.0.1:2375
