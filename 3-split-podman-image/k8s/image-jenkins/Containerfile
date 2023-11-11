@@ -1,0 +1,10 @@
+FROM --platform=linux/amd64 docker.io/jenkins/jenkins:lts-alpine
+
+USER root
+
+RUN apk add --no-cache rsync tzdata shadow make podman docker-cli docker-cli-compose
+
+USER jenkins
+
+ENV CONTAINER_HOST=tcp://127.0.0.1:2375
+ENV DOCKER_HOST=tcp://127.0.0.1:2375

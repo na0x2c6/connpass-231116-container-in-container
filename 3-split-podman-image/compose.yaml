@@ -1,0 +1,18 @@
+services:
+  podman:
+    image: quay.io/podman/stable:latest
+    privileged: true
+      # security_opt:
+      #   - label:disable
+      # user: podman
+    devices:
+      - /dev/fuse
+    volumes:
+      - ./k8s:/var/k8s:z
+      - ./k8s/jenkins_home:/var/jenkins_home:z
+    working_dir: /var/k8s
+    command: sh -c 'podman kube play k8s.yaml && podman pod logs -f ci-pod'
+    ports:
+      - 8080:8080
+      - 2375:2375
+

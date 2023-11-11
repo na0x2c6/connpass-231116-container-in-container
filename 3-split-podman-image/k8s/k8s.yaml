@@ -1,0 +1,62 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-4.7.2
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    bind-mount-options: /var/jenkins_home:z
+  creationTimestamp: "2023-11-11T06:00:41Z"
+  labels:
+    app: ci-pod
+  name: ci-pod
+spec:
+  containers:
+  - command:
+    - podman
+    - --log-level=debug
+    - system
+    - service
+    - --time=0
+    - tcp://:2375
+    image: quay.io/podman/stable:latest
+    name: ci-podman
+    ports:
+    - containerPort: 2375
+      hostPort: 2375
+    - containerPort: 8080
+      hostPort: 8080
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+      seLinuxOptions:
+        type: spc_t
+    volumeMounts:
+    - mountPath: /var/jenkins_home
+      name: jenkins_home-host-0
+    - mountPath: /home/podman/.local/share/containers
+      name: a2d5a86ee9b23c4de28d6a0b7ac3121b3f9e94c63edbb28943a152e7145c0421-pvc
+    - mountPath: /var/lib/containers
+      name: e26e3c8e07a6553599ba7c5ad16fdc9bec5b700f7fa4d9a838ed153fdba6433e-pvc
+  - env:
+    - name: JAVA_OPTS
+      # see: https://stackoverflow.com/a/75296913
+      value: -Djdk.lang.Process.launchMechanism=vfork
+    image: image-jenkins
+    name: ci-jenkins
+    securityContext: {}
+    volumeMounts:
+    - mountPath: /var/jenkins_home
+      name: jenkins_home-host-0
+  volumes:
+  - name: e26e3c8e07a6553599ba7c5ad16fdc9bec5b700f7fa4d9a838ed153fdba6433e-pvc
+    persistentVolumeClaim:
+      claimName: e26e3c8e07a6553599ba7c5ad16fdc9bec5b700f7fa4d9a838ed153fdba6433e
+  - hostPath:
+      path: /var/jenkins_home
+      type: Directory
+    name: jenkins_home-host-0
+  - name: a2d5a86ee9b23c4de28d6a0b7ac3121b3f9e94c63edbb28943a152e7145c0421-pvc
+    persistentVolumeClaim:
+      claimName: a2d5a86ee9b23c4de28d6a0b7ac3121b3f9e94c63edbb28943a152e7145c0421
