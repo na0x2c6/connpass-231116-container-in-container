@@ -6,10 +6,12 @@ services:
       - /dev/fuse
     volumes:
       - ./k8s:/var/k8s:z
-      - ./k8s/jenkins_home:/var/jenkins_home:z
+      - podman_cache:/var/lib/containers
     working_dir: /var/k8s
-    command: sh -c 'podman kube play k8s.yaml && podman pod logs -f ci-pod'
+    command: sh -c 'podman kube play --replace k8s.yaml && podman pod logs -f ci-pod'
     ports:
       - 8080:8080
       - 2375:2375
 
+volumes:
+  podman_cache:
