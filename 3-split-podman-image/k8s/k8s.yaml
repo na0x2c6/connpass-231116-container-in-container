@@ -5,8 +5,6 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  annotations:
-    bind-mount-options: /var/jenkins_home:z
   creationTimestamp: "2023-11-11T06:00:41Z"
   labels:
     app: ci-pod
@@ -34,7 +32,7 @@ spec:
         type: spc_t
     volumeMounts:
     - mountPath: /var/jenkins_home
-      name: jenkins_home-host-0
+      name: jenkins_home
     - mountPath: /home/podman/.local/share/containers
       name: a2d5a86ee9b23c4de28d6a0b7ac3121b3f9e94c63edbb28943a152e7145c0421-pvc
     - mountPath: /var/lib/containers
@@ -44,15 +42,14 @@ spec:
     securityContext: {}
     volumeMounts:
     - mountPath: /var/jenkins_home
-      name: jenkins_home-host-0
+      name: jenkins_home
   volumes:
   - name: e26e3c8e07a6553599ba7c5ad16fdc9bec5b700f7fa4d9a838ed153fdba6433e-pvc
     persistentVolumeClaim:
       claimName: e26e3c8e07a6553599ba7c5ad16fdc9bec5b700f7fa4d9a838ed153fdba6433e
-  - hostPath:
-      path: /var/jenkins_home
-      type: Directory
-    name: jenkins_home-host-0
   - name: a2d5a86ee9b23c4de28d6a0b7ac3121b3f9e94c63edbb28943a152e7145c0421-pvc
     persistentVolumeClaim:
       claimName: a2d5a86ee9b23c4de28d6a0b7ac3121b3f9e94c63edbb28943a152e7145c0421
+  - name: jenkins_home
+    persistentVolumeClaim:
+      claimName: jenkins_home
